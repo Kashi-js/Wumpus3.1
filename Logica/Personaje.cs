@@ -1,24 +1,48 @@
-﻿namespace Logica
+﻿using System.Diagnostics;
+
+namespace Logica
 {
     public class Personaje : Entidad
     {
         public int Dinero { get; set; }
         public int Vida { get; set; }
+        public int Pokeball { get; set; }
 
-        public Personaje(int x, int y, int dinero, int vida) : base(x, y)
+        public Personaje(int x, int y, int dinero, int vida, int pokeball) : base(x, y)
         {
             Dinero = dinero;
             Vida = vida;
+            Pokeball = pokeball;
         }
+        public event Action<int> OroRecogido;
+        public event Action<int> VidaPerdida;
 
         public void Ejecutar(Mapa mapa)
         {
-            //Entidad entidad = mapa.ObtenerEntidad(X, Y);
+            Entidad entidad = mapa.ObtenerEntidad(X, Y);
 
+            if (entidad is Oro oro)
+            {
+                oro.Recoger(this);
+                OroRecogido?.Invoke(Dinero); // ✅ Notificar cambio de oro
+            }
+            else if (entidad is Trampa trampa)
+            {
+                trampa.Activar(this);
+                VidaPerdida?.Invoke(Vida); // ✅ Notificar pérdida de vida
+            }
+            else if (entidad is Enemigo enemigo)
+            {
+                enemigo.Atacar(this);
+                VidaPerdida?.Invoke(Vida); // ✅ Notificar pérdida de vida
+            }
+
+            Debug.WriteLine($"🔹 Acción ejecutada en [{X}, {Y}] con entidad {entidad?.GetType().Name}");
         }
 
         public void Moverse(int deltaX, int deltaY, Mapa mapa)
         {
+            Debug.WriteLine($"🔍 Antes de mover: X={X}, Y={Y}");
             int nuevoX = X + deltaX;
             int nuevoY = Y + deltaY;
 
@@ -27,8 +51,14 @@
             {
                 X = nuevoX;
                 Y = nuevoY;
+                Debug.WriteLine($"✅ Después de mover: X={X}, Y={Y}");
                 Ejecutar(mapa);
             }
+            else
+            {
+                Debug.WriteLine($"🚫 Movimiento inválido a X={nuevoX}, Y={nuevoY}");
+            }
+
         }
     }
 }

@@ -1,12 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 
 namespace Logica
 {
-    internal class Trampa
+    public class Trampa : Entidad
     {
+        public Trampa(int x, int y) : base(x, y){}
+        public void Activar(Personaje personaje)
+        {
+            if (personaje != null && personaje.Vida > 0)
+            {
+                personaje.Vida -= 1; // ✅ Quitar 1 de vida
+            }
+        }
+
     }
+
 }

@@ -5,7 +5,7 @@ namespace Wumpus3._1.Visual
 {
     public static class EntidadVisual
     {
-        public static PictureBox CrearEntidad(string rutaImagen, Size tamano, Point posicion)
+        public static PictureBox CrearEntidad(string rutaImagen, Size tamano, Point posicion, bool visible = true)
         {
             return new PictureBox
             {
@@ -14,7 +14,9 @@ namespace Wumpus3._1.Visual
                 Image = Image.FromFile(rutaImagen),
                 Location = posicion,
                 Size = tamano,
-                SizeMode = PictureBoxSizeMode.Zoom
+                SizeMode = PictureBoxSizeMode.Zoom,
+                Visible = visible // 🔹 Agregamos la propiedad `Visible`
+
             };
         }
     }
