@@ -10,37 +10,41 @@ namespace Wumpus3._1.Visual
         private FormLog formLog; // 🔹 Referencia a la ventana del log
         private Mapa mapa;
         private TableLayoutPanel tablaMapa;
+        private Dictionary<(int, int), PictureBox> elementosOcultos; // 🔹 Agregar propiedad
+        private PictureBox personajeVisual; // 🔹 Agregar propiedad
 
-        public LogJuego(Mapa mapa, FormLog log, TableLayoutPanel tablaMapa)
+
+        public LogJuego(Mapa mapa, FormLog log, TableLayoutPanel tablaMapa, Dictionary<(int, int), PictureBox> elementosOcultos, PictureBox personajeVisual)
         {
             this.formLog = log;
             this.mapa = mapa;
             this.tablaMapa = tablaMapa;
+            this.elementosOcultos = elementosOcultos; // ✅ Guardar referencia a elementos ocultos
+            this.personajeVisual = personajeVisual;   // ✅ Guardar referencia a la imagen del personaje
         }
 
         public void ActualizarLog(int x, int y)
         {
-            if (formLog == null || tablaMapa == null)
+            if (formLog == null)
             {
-                Debug.WriteLine("⚠️ Error: `formLog` o `tablaMapa` es null.");
+                Debug.WriteLine("⚠️ Error: `formLog` es null.");
                 return;
             }
 
-            // 🔹 Obtener la imagen desde `tablaMapa`
-            Control entidadVisual = tablaMapa.GetControlFromPosition(x, y);
-
-            if (entidadVisual is PictureBox pictureBox)
+            // 🔹 Obtener la imagen desde `elementosOcultos`
+            if (!elementosOcultos.TryGetValue((x, y), out PictureBox entidadVisual) || entidadVisual.Image == null)
             {
-                formLog.pictureBox1.Image = pictureBox.Image; // 🔹 Asignar imagen directamente al log
-                Debug.WriteLine($"✅ Imagen extraída desde `tablaMapa` en [{x}, {y}]");
+                formLog.pictureBox1.Image = Image.FromFile("Recursos/hierba.png"); // ✅ Fallback a "hierba.png"
+                Debug.WriteLine($"🌿 Imagen por defecto mostrada en [{x}, {y}]");
             }
             else
             {
-                Debug.WriteLine($"⚠️ No se encontró un PictureBox en [{x}, {y}].");
-                formLog.pictureBox1.Image = null; // 🔹 Limpiar imagen si no hay entidad
+                formLog.pictureBox1.Image = entidadVisual.Image; // ✅ Usar imagen de la entidad si está disponible
+                Debug.WriteLine($"✅ Imagen recuperada desde `elementosOcultos` en [{x}, {y}]");
             }
 
-            // 🔹 Obtener la posición actual del personaje y la letra en el bloc
+
+            // 🔹 Obtener mensaje de la celda
             Personaje jugador = mapa.ObtenerPersonaje();
             if (jugador == null)
             {
@@ -58,9 +62,15 @@ namespace Wumpus3._1.Visual
 
             // 🔹 Generar mensaje según la letra en el bloc
             string mensaje = ObtenerMensajePorLetra(letraCelda);
-
             formLog.AgregarMensaje(letraCelda, mensaje);
+
             Debug.WriteLine($"✅ Mensaje agregado al log según la celda [{jugador.X}, {jugador.Y}]: [{letraCelda}] {mensaje}");
+        }
+
+        public void ResetearLog()
+        {
+            formLog.LimpiarLog(); // ✅ Método que vacía el historial en la interfaz
+            Debug.WriteLine("📝 Historial de movimientos reseteado.");
         }
 
         private string ObtenerMensajePorLetra(string letraCelda)

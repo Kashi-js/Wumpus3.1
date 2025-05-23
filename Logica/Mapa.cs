@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
+using static System.Net.Mime.MediaTypeNames;
 using static System.Net.WebRequestMethods;
 
 namespace Logica
@@ -14,8 +16,10 @@ namespace Logica
         {
             this.x = x;
             this.y = y;
-            mapa = new Entidad[x, y]; // Inicializar matriz de entidades
+            this.mapa = new Entidad[x, y];
         }
+
+
 
         int personajeX = 0;
         int personajeY = 0; 
@@ -137,5 +141,19 @@ namespace Logica
             return rutaMapa;
         }
 
+        public bool EsDentroDeLimite(int x, int y)
+        {
+            return x >= 0 && x < this.x && y >= 0 && y < this.y;
+        }
+
+        public void SimularBola(int x, int y, Action<int, int> actualizarVisual)
+        {
+            if (!EsDentroDeLimite(x, y)) return;
+
+            Debug.WriteLine($"⚡ Trayectoria de bola en [{x}, {y}]");
+
+            // 🔹 Notificar a la capa visual que debe actualizar la imagen de la bola
+            actualizarVisual?.Invoke(x, y);
+        }
     }
 }

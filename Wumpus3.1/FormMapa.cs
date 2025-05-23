@@ -9,9 +9,8 @@ using Wumpus3._1.Visual;
 public class FormMapa : Form
 {
     private Mapa mapa;
-    private PictureBox personajeVisual, pictureBoxBola, pictureBox1, pictureBox2, pictureBox3, pictureBox4, pictureBoxOro;
-    private Panel panel1;
-    private TableLayoutPanel tablaMapa, tablaInventario;
+    private PictureBox personajeVisual, pictureBoxBola, pictureBoxOro;
+    private TableLayoutPanel tablaMapa, tablaInventario; 
     private Label labelOro, labelBola;
     private PictureBox[] corazones;
     private FormLog formLog;
@@ -48,7 +47,7 @@ public class FormMapa : Form
         };
 
         pictureBoxOro = EntidadVisual.CrearEntidad("Recursos/gold.png", new Size(35, 35), new Point(0, 0));
-        labelOro = new Label { Text = "0", Font = new Font("Arial", 12, FontStyle.Bold), ForeColor = Color.Gold, AutoSize = true };
+        labelOro = new Label { Text = "0", Font = new Font("Arial", 12, FontStyle.Bold), ForeColor = Color.DarkGoldenrod, AutoSize = true };
 
         // 🔹 Agregar elementos al `layoutOro`
         layoutOro.Controls.Add(pictureBoxOro, 0, 0);
@@ -67,7 +66,7 @@ public class FormMapa : Form
         layoutVidas.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33));
         layoutVidas.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33));
 
-
+        // 🔹 Configurar `layoutVidas`
         corazones = new PictureBox[3];
         for (int i = 0; i < corazones.Length; i++)
         {
@@ -126,10 +125,19 @@ public class FormMapa : Form
         // 🔹 Inicializar mapa y entidades
         mapa = new Mapa(8, 8);
         formLog = new FormLog();
-        logJuego = new LogJuego(mapa, formLog, tablaMapa);
+        logJuego = new LogJuego(mapa, formLog, tablaMapa, elementosOcultos, personajeVisual); // ✅ Pasamos `elementosOcultos`
         formLog.Show();
         mapa.InicializarMapa();
         PosicionarEntidades();
+
+        // 🔹 Obtener referencia del personaje y suscribir eventos
+        Personaje jugador = mapa.ObtenerPersonaje();
+        if (jugador != null)
+        {
+            jugador.OroRecogido += ActualizarOro;
+            jugador.VidaPerdida += ActualizarVida;
+        }
+
 
         this.KeyDown += new KeyEventHandler(OnKeyDown);
     }
@@ -142,7 +150,6 @@ public class FormMapa : Form
         if (jugador != null)
         {
             Debug.WriteLine($"Personaje en FormMapa.cs: X={jugador.X}, Y={jugador.Y}");
-
             personajeVisual = EntidadVisual.CrearEntidad("Recursos/personaje.png", new Size(60, 56), new Point(0, 0));
             tablaMapa.Controls.Add(personajeVisual, jugador.X, jugador.Y);
         }
@@ -223,6 +230,11 @@ public class FormMapa : Form
         if (e.KeyCode == Keys.D) deltaX = 1;
 
         Personaje jugador = mapa.ObtenerPersonaje();
+        //if (e.KeyCode == Keys.Up) jugador.Lanzar(mapa, ActualizarBolaVisual, "Arriba");
+        //if (e.KeyCode == Keys.Down) jugador.Lanzar(mapa, ActualizarBolaVisual, "Abajo");
+        //if (e.KeyCode == Keys.Left) jugador.Lanzar(mapa, ActualizarBolaVisual, "Izquierda");
+        //if (e.KeyCode == Keys.Right) jugador.Lanzar(mapa, ActualizarBolaVisual, "Derecha");
+
         if (jugador != null)
         {
             Debug.WriteLine($"📍 Mapa lógico -> X={jugador.X}, Y={jugador.Y}");
@@ -255,6 +267,42 @@ public class FormMapa : Form
 
         }
     }
+
+    private void ActualizarOro(int cantidad)
+    {
+        labelOro.Text = $"{cantidad}";
+        Debug.WriteLine($"💰 Oro actualizado: {cantidad}");
+    }
+
+    private void ActualizarVida(int vidasRestantes)
+    {
+        for (int i = 0; i < corazones.Length; i++)
+        {
+            corazones[i].Visible = i < vidasRestantes;
+        }
+        Debug.WriteLine($"❤️ Vidas restantes: {vidasRestantes}");
+    }
+
+   
+
+    public void ActualizarBolaVisual(int x, int y)
+    {
+        if (!elementosOcultos.ContainsKey((x, y)))
+        {
+            elementosOcultos[(x, y)] = new PictureBox
+            {
+                Image = Image.FromFile("Recursos/pokeball.png"),
+                Size = new Size(60, 56),
+                Visible = true
+            };
+
+            tablaMapa.Controls.Add(elementosOcultos[(x, y)], x, y);
+        }
+
+        Debug.WriteLine($"⚡ Bola visualizada en [{x}, {y}]");
+        logJuego.ActualizarLog(x,y);
+    }
+
 
 
 }

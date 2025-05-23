@@ -52,6 +52,7 @@ namespace Wumpus3._1
             pictureBox1.Location = new Point(97, 12);
             pictureBox1.Name = "pictureBox1";
             pictureBox1.Size = new Size(80, 73);
+            pictureBox1.Image = Image.FromFile("Recursos/hierba.png");
             pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox1.TabIndex = 1;
             pictureBox1.TabStop = false;
@@ -76,7 +77,7 @@ namespace Wumpus3._1
             Controls.Add(pictureBox1);
             Controls.Add(richTextBox1);
             Name = "FormLog";
-            Text = "FormLog";
+            Text = "Log";
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
             PerformLayout();
@@ -87,6 +88,12 @@ namespace Wumpus3._1
         private RichTextBox richTextBox1;
         public PictureBox pictureBox1;
         private Label label1;
+
+        public void LimpiarLog()
+        {
+            richTextBox1.Clear(); // ✅ Vaciar el contenido del log
+            Debug.WriteLine("📝 Historial del log limpiado.");
+        }
 
         public void AgregarMensaje(string tipoCelda, string mensaje)
         {
@@ -106,7 +113,7 @@ namespace Wumpus3._1
                     break;
                 case "G":
                 case "K":
-                    richTextBox1.SelectionColor = Color.Gold; // 💰 Oro: Dorado
+                    richTextBox1.SelectionColor = Color.DarkGoldenrod; // 💰 Oro: Dorado
                     break;
                 default:
                     richTextBox1.SelectionColor = Color.Black; // 🔍 Celda normal
