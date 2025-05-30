@@ -5,7 +5,7 @@ using System.Windows.Forms;
 using Logica;
 using Wumpus3._1;
 using Wumpus3._1.Visual;
-
+ 
 public class FormMapa : Form
 {
     private Mapa mapa;

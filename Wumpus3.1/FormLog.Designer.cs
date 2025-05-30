@@ -94,7 +94,7 @@ namespace Wumpus3._1
             richTextBox1.Clear(); // ✅ Vaciar el contenido del log
             Debug.WriteLine("📝 Historial del log limpiado.");
         }
-
+         
         public void AgregarMensaje(string tipoCelda, string mensaje)
         {
             richTextBox1.SelectionStart = richTextBox1.TextLength;

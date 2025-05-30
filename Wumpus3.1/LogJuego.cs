@@ -59,7 +59,7 @@ namespace Wumpus3._1.Visual
                 Debug.WriteLine($"⚠️ No se encontró información en el bloc para la celda [{jugador.X}, {jugador.Y}].");
                 return;
             }
-
+             
             // 🔹 Generar mensaje según la letra en el bloc
             string mensaje = ObtenerMensajePorLetra(letraCelda);
             formLog.AgregarMensaje(letraCelda, mensaje);
